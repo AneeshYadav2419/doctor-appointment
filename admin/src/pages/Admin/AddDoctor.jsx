@@ -213,7 +213,7 @@ const AddDoctor = () => {
 
                         <div>
                             <p>Experience</p>
-                            <select onChange={() => setExperience(e.target.value)} value={experience} name='' id='' className='w-full border px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-400'>
+                            <select onChange={(e) => setExperience(e.target.value)} value={experience} name='' id='' className='w-full border px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-400'>
                                 <option value="1 Year">1 Year</option>
                                 <option value="2 Year">2 Year</option>
                                 <option value="3 Year">3 Year</option>
