@@ -128,8 +128,8 @@ Cloudinary (Image Upload)
 
 🏗 Project Structure
 
-
 Medilink
+
 │
 ├── frontend      # User Website (React)
 │
