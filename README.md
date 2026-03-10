@@ -127,6 +127,8 @@ Razorpay (Payments)
 Cloudinary (Image Upload)
 
 🏗 Project Structure
+
+
 Medilink
 │
 ├── frontend      # User Website (React)
@@ -136,6 +138,7 @@ Medilink
 ├── backend       # Node.js API Server
 │
 └── README.md
+
 
 📊 Key Functionalities
 
