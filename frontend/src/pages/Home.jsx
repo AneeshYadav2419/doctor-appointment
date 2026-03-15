@@ -1,18 +1,39 @@
-import React from 'react'
+// import React from 'react'
+// import Header from '../components/Header'
+// import SpecialityMenu from '../components/SpecialityMenu'
+// import TopDoctors from '../components/TopDoctors'
+// import Banner from '../components/Banner'
+
+// const Home = () => {
+//   return (
+//     <div>
+//         <Header />
+//         <SpecialityMenu />
+//         <TopDoctors />
+//         <Banner />
+//     </div>
+//   )
+// }
+
+// export default Home
+
+import React, { lazy, Suspense } from "react";
 import Header from '../components/Header'
-import SpecialityMenu from '../components/SpecialityMenu'
-import TopDoctors from '../components/TopDoctors'
-import Banner from '../components/Banner'
+const SpecialityMenu = lazy(() => import("../components/SpecialityMenu"));
+const TopDoctors = lazy(() => import("../components/TopDoctors"));
+const Banner = lazy(() => import("../components/Banner"));
 
 const Home = () => {
   return (
-    <div>
+    <Suspense fallback={<div className="text-center py-10">Loading...</div>}>
+      <div>
         <Header />
         <SpecialityMenu />
         <TopDoctors />
         <Banner />
-    </div>
-  )
-}
+      </div>
+    </Suspense>
+  );
+};
 
-export default Home
+export default React.memo(Home);
