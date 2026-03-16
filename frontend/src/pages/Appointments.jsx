@@ -185,7 +185,7 @@
 
 // export default Appointments
 
-import React, { useContext, useEffect, useMemo, useState, useCallback } from "react";
+import React, { useContext, useEffect, useState, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { AppContext } from "../context/AppContext";
 import { assets } from "../assets/assets";
@@ -203,16 +203,18 @@ const Appointments = () => {
   const { doctors, currencySymbol, backendUrl, token, getDoctorsData } =
     useContext(AppContext);
 
+  const [docInfo, setDocInfo] = useState(null);
   const [docSlots, setDocSlots] = useState([]);
   const [slotIndex, setSlotIndex] = useState(0);
   const [slotTime, setSlotTime] = useState("");
 
-  // Doctor info
-  const docInfo = useMemo(() => {
-    return doctors.find((doc) => doc._id === docId);
+  // Fetch doctor info
+  const fetchDocInfo = useCallback(() => {
+    const doctor = doctors.find((doc) => doc._id === docId);
+    setDocInfo(doctor);
   }, [doctors, docId]);
 
-  // Generate slots
+  // Generate available slots
   const getAvailableSlots = useCallback(() => {
 
     if (!docInfo) return;
@@ -254,7 +256,9 @@ const Appointments = () => {
         const slotDate = `${day}_${month}_${year}`;
 
         const isSlotAvailable =
-          !docInfo.slots_booked?.[slotDate]?.includes(formattedTime);
+          docInfo.slots_booked?.[slotDate]?.includes(formattedTime)
+            ? false
+            : true;
 
         if (isSlotAvailable) {
           timeSlots.push({
@@ -273,12 +277,8 @@ const Appointments = () => {
 
   }, [docInfo]);
 
-  useEffect(() => {
-    getAvailableSlots();
-  }, [getAvailableSlots]);
-
-  // Booking function
-  const bookAppointment = async () => {
+  // Book appointment
+  const bookAppointment = useCallback(async () => {
 
     if (!token) {
       toast.warn("Login to book appointment");
@@ -287,13 +287,7 @@ const Appointments = () => {
 
     try {
 
-      if (!slotTime) {
-        return toast.warn("Please select a time slot");
-      }
-
-      const date =
-        docSlots[slotIndex]?.[0]?.datetime ||
-        new Date(new Date().setDate(new Date().getDate() + slotIndex));
+      const date = docSlots[slotIndex][0].datetime;
 
       const day = date.getDate();
       const month = date.getMonth() + 1;
@@ -310,7 +304,9 @@ const Appointments = () => {
       if (data.success) {
 
         toast.success(data.message);
+
         await getDoctorsData();
+
         navigate("/my-appointments");
 
       } else {
@@ -318,13 +314,24 @@ const Appointments = () => {
       }
 
     } catch (error) {
+
+      console.error(error);
+
       toast.error(error.message);
+
     }
-  };
 
-  if (!docInfo) return null;
+  }, [token, docSlots, slotIndex, slotTime, backendUrl, docId, navigate, getDoctorsData]);
 
-  return (
+  useEffect(() => {
+    fetchDocInfo();
+  }, [fetchDocInfo]);
+
+  useEffect(() => {
+    getAvailableSlots();
+  }, [getAvailableSlots]);
+
+  return docInfo && (
     <div>
 
       {/* Doctor Details */}
@@ -337,7 +344,7 @@ const Appointments = () => {
           alt={docInfo.name}
         />
 
-        <div className="flex-1 border border-gray-400 rounded-lg p-8 bg-white">
+        <div className="flex-1 border border-gray-400 rounded-lg p-8 py-7 bg-white mx-2 sm:mx-0 mt-[-80px] sm:mt-0">
 
           <p className="flex items-center gap-2 text-2xl font-medium text-gray-900">
             {docInfo.name}
@@ -345,23 +352,27 @@ const Appointments = () => {
           </p>
 
           <div className="flex items-center gap-2 text-sm mt-1 text-gray-600">
+
             <p>
               {docInfo.degree} - {docInfo.speciality}
             </p>
 
-            <span className="py-0.5 px-2 border text-xs rounded-full">
+            <button className="py-0.5 px-2 text-xs rounded-full">
               {docInfo.experience}
-            </span>
+            </button>
+
           </div>
 
-          <div className="mt-3">
-            <p className="flex items-center gap-1 text-sm font-medium text-gray-900">
+          <div>
+
+            <p className="flex items-center gap-1 text-sm font-medium text-gray-900 mt-3">
               About <img src={assets.info_icon} alt="" />
             </p>
 
-            <p className="text-sm text-gray-500 mt-1 max-w-[700px]">
+            <p className="text-sm text-gray-500 max-w-[700px] mt-1">
               {docInfo.about}
             </p>
+
           </div>
 
           <p className="text-gray-500 font-medium mt-4">
@@ -376,74 +387,59 @@ const Appointments = () => {
 
       </div>
 
-      {/* Slots */}
+      {/* Booking Slots */}
 
-      <div className="sm:ml-72 sm:pl-4 mt-6">
+      <div className="sm:ml-72 sm:pl-4 mt-4 font-medium text-gray-700">
 
-        <p className="font-medium text-gray-700">Booking Slots</p>
+        <p>Booking Slots</p>
 
-        {/* Days */}
+        <div className="flex gap-3 items-center w-full overflow-x-scroll mt-4">
 
-        <div className="flex gap-3 overflow-x-auto mt-4">
+          {docSlots.map((item, index) => (
 
-          {docSlots.map((item, index) => {
+            <div
+              key={index}
+              onClick={() => setSlotIndex(index)}
+              className={`text-center py-6 min-w-16 rounded-full cursor-pointer ${
+                slotIndex === index
+                  ? "bg-primary text-white"
+                  : "border border-gray-200"
+              }`}
+            >
 
-            const date =
-              item.length
-                ? item[0].datetime
-                : new Date(new Date().setDate(new Date().getDate() + index));
+              <p>{item[0] && daysOfWeek[item[0].datetime.getDay()]}</p>
 
-            return (
-              <div
-                key={index}
-                onClick={() => setSlotIndex(index)}
-                className={`text-center py-6 min-w-16 rounded-full cursor-pointer ${
-                  slotIndex === index
-                    ? "bg-primary text-white"
-                    : "border border-gray-200"
-                }`}
-              >
-                <p>{daysOfWeek[date.getDay()]}</p>
-                <p>{date.getDate()}</p>
-              </div>
-            );
-          })}
+              <p>{item[0] && item[0].datetime.getDate()}</p>
+
+            </div>
+
+          ))}
 
         </div>
 
-        {/* Time Slots */}
+        <div className="flex items-center gap-3 w-full overflow-x-scroll mt-4">
 
-        <div className="flex gap-3 overflow-x-auto mt-4">
+          {docSlots[slotIndex]?.map((item, index) => (
 
-          {docSlots[slotIndex]?.length > 0 ? (
+            <p
+              key={index}
+              onClick={() => setSlotTime(item.time)}
+              className={`text-sm font-light flex-shrink-0 px-5 py-2 rounded-full cursor-pointer ${
+                item.time === slotTime
+                  ? "bg-primary text-white"
+                  : "text-gray-400 border border-gray-200"
+              }`}
+            >
+              {item.time.toLowerCase()}
+            </p>
 
-            docSlots[slotIndex].map((item) => (
-
-              <p
-                key={item.time}
-                onClick={() => setSlotTime(item.time)}
-                className={`text-sm px-5 py-2 rounded-full cursor-pointer ${
-                  item.time === slotTime
-                    ? "bg-primary text-white"
-                    : "text-gray-400 border"
-                }`}
-              >
-                {item.time.toLowerCase()}
-              </p>
-
-            ))
-
-          ) : (
-
-            <p className="text-gray-400">No slots available</p>
-
-          )}
+          ))}
 
         </div>
 
         <button
           onClick={bookAppointment}
-          className="bg-primary text-white text-sm px-14 py-3 rounded-full my-6"
+          className="bg-primary text-white text-sm font-light px-14 py-3 rounded-full my-6"
         >
           Book Appointment
         </button>
