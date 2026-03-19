@@ -25,7 +25,7 @@ const Banner = lazy(() => import("../components/Banner"));
 
 const Home = () => {
   return (
-    <Suspense fallback={<div className="text-center py-10">Loading...</div>}>
+    <Suspense fallback={<div className="text-center py-10">Please Wait...</div>}>
       <div>
         <Header />
         <SpecialityMenu />
