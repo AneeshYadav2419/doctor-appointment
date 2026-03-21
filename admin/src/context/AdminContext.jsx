@@ -122,7 +122,7 @@ const AdminContextProvider = (props) => {
 
     // 🔥 common config (avoid repeat)
     const config = {
-        headers: { aToken }
+          headers: { atoken: aToken }
     }
 
     // ✅ GET ALL DOCTORS (memoized)
