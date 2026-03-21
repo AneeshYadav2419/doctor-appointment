@@ -25,13 +25,10 @@
 // export default authAdmin
 
 import jwt from 'jsonwebtoken'
-
-// admin authentication middleware
 const authAdmin = async (req, res, next) => {
   try {
     const { atoken } = req.headers
 
-    // 1. token check
     if (!atoken) {
       return res.status(401).json({
         success: false,
@@ -39,20 +36,16 @@ const authAdmin = async (req, res, next) => {
       })
     }
 
-    // 2. verify token
     const decoded = jwt.verify(atoken, process.env.JWT_SECRET)
 
-    // 3. validate admin
-    const adminKey = process.env.ADMIN_EMAIL + process.env.ADMIN_PASSWORD
-
-    if (decoded !== adminKey) {
+    // ✅ FIX: check email instead of full object
+    if (decoded.email !== process.env.ADMIN_EMAIL) {
       return res.status(403).json({
         success: false,
         message: "Not authorized"
       })
     }
 
-    // 4. next middleware
     next()
 
   } catch (error) {
@@ -64,5 +57,4 @@ const authAdmin = async (req, res, next) => {
     })
   }
 }
-
 export default authAdmin
