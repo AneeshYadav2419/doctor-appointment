@@ -6,7 +6,7 @@ import { v2 as cloudinary } from 'cloudinary'
 import appointmentModel from '../models/appointmentModel.js'
 import doctorModel from "../models/doctorModel.js";
 import razorpay from 'razorpay'
-
+import { sendEmail } from "../utils/email.js";
 // api to register user 
 
 const registerUser = async (req, res) => {
@@ -37,6 +37,62 @@ const registerUser = async (req, res) => {
 
         const newUser = new userModel(userData)
         const user = await newUser.save()
+
+          // ✅ EMAIL SEND (ADDED)
+        try {
+            await sendEmail(
+                email,
+                "Welcome to MediLink 🎉",
+                `
+                <div style="font-family: Arial, sans-serif; background:#f4f6f8; padding:20px;">
+                  
+                  <div style="max-width:600px; margin:auto; background:white; border-radius:12px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+                    
+                    <!-- Header -->
+                    <div style="background:#1976d2; color:white; padding:20px; text-align:center;">
+                      <h2 style="margin:0;">MediLink</h2>
+                      <p style="margin:5px 0 0;">Welcome 🎉</p>
+                    </div>
+
+                    <!-- Body -->
+                    <div style="padding:20px;">
+                      
+                      <p style="font-size:16px;">Hi <b>${name}</b>,</p>
+                      
+                      <p style="color:#555;">
+                        Welcome to <b>MediLink</b>! 🎉 Your account has been successfully created.
+                      </p>
+
+                      <p style="color:#555;">
+                        You can now easily book doctor appointments, manage schedules, and make secure payments.
+                      </p>
+
+                      <!-- CTA -->
+                      <div style="text-align:center; margin:25px 0;">
+                        <a href="#" 
+                           style="background:#1976d2; color:white; padding:12px 20px; text-decoration:none; border-radius:6px; font-weight:bold;">
+                           Book Appointment
+                        </a>
+                      </div>
+
+                      <p style="color:#777; font-size:14px;">
+                        We're here to make your healthcare experience seamless and easy 💙
+                      </p>
+
+                    </div>
+
+                    <!-- Footer -->
+                    <div style="background:#f1f1f1; padding:15px; text-align:center; font-size:12px; color:#777;">
+                      © 2026 MediLink. All rights reserved.
+                    </div>
+
+                  </div>
+                </div>
+                `
+            )
+        } catch (e) {
+            console.log("Welcome Email failed:", e.message)
+        }
 
         //create token
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET)
@@ -158,6 +214,71 @@ const bookAppointment = async (req, res) => {
         const newAppointment = new appointmentModel(appointmentData)
         await newAppointment.save()
 
+        // ✅ EMAIL SEND (ADDED)
+        try {
+            await sendEmail(
+                userData.email,
+                "Appointment Confirmed ✅",
+                `
+        <div style="font-family: Arial, sans-serif; background:#f4f6f8; padding:20px;">
+          
+          <div style="max-width:600px; margin:auto; background:white; border-radius:12px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+            
+            <!-- Header -->
+            <div style="background:#4CAF50; color:white; padding:20px; text-align:center;">
+              <h2 style="margin:0;">MediLink</h2>
+              <p style="margin:5px 0 0;">Appointment Confirmed 🎉</p>
+            </div>
+
+            <!-- Body -->
+            <div style="padding:20px;">
+              
+              <p style="font-size:16px;">Hi <b>${userData.name}</b>,</p>
+              
+              <p style="color:#555;">
+                Your appointment has been successfully booked. Here are your details:
+              </p>
+
+              <!-- Card -->
+              <div style="background:#f9f9f9; padding:15px; border-radius:10px; margin:20px 0;">
+                <p><b>👨‍⚕️ Doctor:</b> ${docData.name}</p>
+                <p><b>📅 Date:</b> ${slotDate}</p>
+                <p><b>⏰ Time:</b> ${slotTime}</p>
+                <p><b>💰 Fees:</b> ₹${docData.fees}</p>
+              </div>
+
+              <p style="color:#555;">
+                Please arrive 10 minutes before your scheduled time.
+              </p>
+
+              <!-- Button -->
+              <div style="text-align:center; margin:25px 0;">
+                <a href="#" 
+                   style="background:#4CAF50; color:white; padding:12px 20px; text-decoration:none; border-radius:6px; font-weight:bold;">
+                   View Appointment
+                </a>
+              </div>
+
+              <p style="color:#777; font-size:14px;">
+                Need help? Contact our support anytime.
+              </p>
+
+            </div>
+
+            <!-- Footer -->
+            <div style="background:#f1f1f1; padding:15px; text-align:center; font-size:12px; color:#777;">
+              © 2026 MediLink. All rights reserved.
+            </div>
+
+          </div>
+        </div>
+        `
+            )
+
+        } catch (e) {
+            console.log("Email failed but appointment booked")
+        }
+
         //save new slots data in docData 
         await doctorModel.findByIdAndUpdate(docId, { slots_booked })
         res.json({ success: true, message: 'Appointment Booked' })
@@ -200,13 +321,54 @@ const cancelAppointment = async (req, res) => {
         await appointmentModel.findByIdAndUpdate(appointmentId, { cancelled: true })
         //releasing doct slot
 
-        const {docId, slotDate,slotTime} = appointmentData
+        const { docId, slotDate, slotTime } = appointmentData
         const doctorData = await doctorModel.findById(docId)
         let slots_booked = doctorData.slots_booked
-        slots_booked[slotDate] = slots_booked[slotDate].filter(e=>e !== slotTime)
+        slots_booked[slotDate] = slots_booked[slotDate].filter(e => e !== slotTime)
 
-        await doctorModel.findByIdAndUpdate(docId, {slots_booked})
-        res.json({success:true, message:"Appointment cancelled"})
+        await doctorModel.findByIdAndUpdate(docId, { slots_booked })
+        // email notiication
+        try {
+            await sendEmail(
+                appointmentData.userData.email,
+                "Appointment Cancelled ❌",
+                `
+                <div style="font-family: Arial, sans-serif; background:#f6f6f6; padding:20px">
+                  <div style="max-width:600px; margin:auto; background:white; padding:20px; border-radius:10px">
+                    
+                    <h2 style="color:#e53935;">Appointment Cancelled ❌</h2>
+                    
+                    <p>Hi <b>${appointmentData.userData.name}</b>,</p>
+                    
+                    <p>Your appointment has been <b>successfully cancelled</b>.</p>
+
+                    <hr/>
+
+                    <h3>📋 Appointment Details</h3>
+                    <p><b>Doctor:</b> ${appointmentData.docData.name}</p>
+                    <p><b>Date:</b> ${slotDate}</p>
+                    <p><b>Time:</b> ${slotTime}</p>
+
+                    <hr/>
+
+                    <p style="color:#555;">
+                      If you made any payment, the refund  will be processed shortly.
+                    </p>
+
+                    <p>We hope to serve you again soon 💙</p>
+
+                    <br/>
+                    <p style="font-size:12px; color:gray;">
+                      — Team MediLink
+                    </p>
+                  </div>
+                </div>
+                `
+            )
+        } catch (e) {
+            console.log("Cancel Email failed:", e.message)
+        }
+        res.json({ success: true, message: "Appointment cancelled" })
     } catch (error) {
 
         console.log(error)
@@ -215,54 +377,145 @@ const cancelAppointment = async (req, res) => {
 }
 
 const razorpayInstance = new razorpay({
-    key_id:process.env.RAZORPAY_KEY_ID,
-    key_secret:process.env.RAZORPAY_KEY_SECRET
+    key_id: process.env.RAZORPAY_KEY_ID,
+    key_secret: process.env.RAZORPAY_KEY_SECRET
 })
 
 //API FOR RAZORPAAY
 
-const paymentRazorpay = async (req,res) => {
+const paymentRazorpay = async (req, res) => {
     try {
-        const {appointmentId} = req.body
+        const { appointmentId } = req.body
         const appointmentData = await appointmentModel.findById(appointmentId)
 
-        if(!appointmentData || appointmentData.cancelled){
-            return res.json({success: false, message:"Appointment Cancelled or not found"})
+        if (!appointmentData || appointmentData.cancelled) {
+            return res.json({ success: false, message: "Appointment Cancelled or not found" })
         }
 
         //create option 
 
         const options = {
-            amount:appointmentData.amount * 100,
+            amount: appointmentData.amount * 100,
             currency: process.env.CURRENCY,
             receipt: appointmentId,
         }
         //creation of an order
-        const order= await razorpayInstance.orders.create(options)
-        res.json({success:true, order})
+        const order = await razorpayInstance.orders.create(options)
+        res.json({ success: true, order })
     } catch (error) {
-       console.log(error)
-        res.json({ success: false, message: error.message })  
+        console.log(error)
+        res.json({ success: false, message: error.message })
     }
 }
 
 //api to verify razorpay 
-const verifyRazorpay = async (req,res) =>{
+// const verifyRazorpay = async (req, res) => {
+//     try {
+//         const { razorpay_order_id } = req.body
+//         const orderInfo = await razorpayInstance.orders.fetch(razorpay_order_id)
+//         if (orderInfo.status === "paid") {
+//             await appointmentModel.findByIdAndUpdate(orderInfo.receipt, { payment: true })
+//             res.json({ success: true, message: "Payment Successful" })
+//         } else {
+//             res.json({ success: false, message: "Payment failed" })
+//         }
+//     } catch (error) {
+//         console.log(error)
+//         res.json({ success: false, message: error.message })
+//     }
+
+
+// }
+const verifyRazorpay = async (req, res) => {
     try {
-        const {razorpay_order_id}= req.body
+        const { razorpay_order_id } = req.body
+
         const orderInfo = await razorpayInstance.orders.fetch(razorpay_order_id)
-        if(orderInfo.status === "paid"){
-            await appointmentModel.findByIdAndUpdate(orderInfo.receipt,{payment:true})
-            res.json({success:true, message:"Payment Successful"})
-        }else{
-            res.json({success:false, message:"Payment failed"})
+
+        if (orderInfo.status === "paid") {
+
+            await appointmentModel.findByIdAndUpdate(orderInfo.receipt, { payment: true })
+
+            // ✅ GET APPOINTMENT DATA (for email)
+            const appointment = await appointmentModel.findById(orderInfo.receipt)
+
+            // ✅ EMAIL SEND (ADDED)
+            try {
+                await sendEmail(
+                    appointment.userData.email,
+                    "Payment Successful 💳",
+                    `
+        <div style="font-family: Arial, sans-serif; background:#f4f6f8; padding:20px;">
+          
+          <div style="max-width:600px; margin:auto; background:white; border-radius:12px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+            
+            <!-- Header -->
+            <div style="background:#2e7d32; color:white; padding:20px; text-align:center;">
+              <h2 style="margin:0;">MediLink</h2>
+              <p style="margin:5px 0 0;">Payment Successful ✅</p>
+            </div>
+
+            <!-- Body -->
+            <div style="padding:20px;">
+              
+              <p style="font-size:16px;">Hi <b>${appointment.userData.name}</b>,</p>
+              
+              <p style="color:#555;">
+                Your payment has been successfully processed. Here are your appointment details:
+              </p>
+
+              <!-- Card -->
+              <div style="background:#f9f9f9; padding:15px; border-radius:10px; margin:20px 0;">
+                <p><b>👨‍⚕️ Doctor:</b> ${appointment.docData.name}</p>
+                <p><b>📅 Date:</b> ${appointment.slotDate}</p>
+                <p><b>⏰ Time:</b> ${appointment.slotTime}</p>
+                <p><b>💰 Amount Paid:</b> ₹${appointment.amount}</p>
+                <p><b>📌 Status:</b> <span style="color:green;">Paid ✅</span></p>
+              </div>
+
+              <p style="color:#555;">
+                Please keep this email for your records. We look forward to serving you.
+              </p>
+
+              <!-- Button -->
+              <div style="text-align:center; margin:25px 0;">
+                <a href="#" 
+                   style="background:#2e7d32; color:white; padding:12px 20px; text-decoration:none; border-radius:6px; font-weight:bold;">
+                   View Appointment
+                </a>
+              </div>
+
+              <p style="color:#777; font-size:14px;">
+                Need help? Contact our support anytime.
+              </p>
+
+            </div>
+
+            <!-- Footer -->
+            <div style="background:#f1f1f1; padding:15px; text-align:center; font-size:12px; color:#777;">
+              © 2026 MediLink. All rights reserved.
+            </div>
+
+          </div>
+        </div>
+        `
+                )
+            } catch (e) {
+                console.log("Email failed but payment successful")
+            }
+
+            res.json({ success: true, message: "Payment Successful" })
+
+        } else {
+            res.json({ success: false, message: "Payment failed" })
         }
+
     } catch (error) {
         console.log(error)
-        res.json({ success: false, message: error.message }) 
+        res.json({ success: false, message: error.message })
     }
 }
 
 
 
-export { registerUser, loginUser, getProfie, updateProfile, bookAppointment, listAppointment, cancelAppointment,paymentRazorpay,verifyRazorpay }
+export { registerUser, loginUser, getProfie, updateProfile, bookAppointment, listAppointment, cancelAppointment, paymentRazorpay, verifyRazorpay }
