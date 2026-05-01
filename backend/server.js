@@ -47,14 +47,23 @@ import adminRouter from './routes/adminRoute.js'
 import doctorRouter from './routes/doctorRoute.js'
 import userRouter from './routes/userRoute.js'
 
-
-
-
+import helmet from 'helmet'
+import rateLimit from 'express-rate-limit'
+import compression from 'compression'
+import morgan from 'morgan'
 
 // app config
 const app = express()
 const port = process.env.PORT || 4000
 
+// rate limiting config
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+  message: 'Too many requests from this IP, please try again after 15 minutes',
+  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+})
 
 // connect services (parallel execution for speed)
 await Promise.all([
@@ -63,12 +72,18 @@ await Promise.all([
 ])
 
 // middlewares
+app.use(helmet()) // Security headers
+app.use(compression()) // Compress responses
+app.use(morgan('dev')) // HTTP request logger
 app.use(express.json({ limit: '10kb' })) // prevent large payload attacks
 app.use(express.urlencoded({ extended: true }))
 app.use(cors({
   origin: '*', // production me specific origin use karo
   credentials: true
 }))
+
+// Apply rate limiting to all /api routes
+app.use('/api', apiLimiter)
 
 // health check route (fast response)
 app.get('/', (req, res) => {
