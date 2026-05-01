@@ -40,13 +40,13 @@ const SpecialityMenu = () => {
         to={`/doctors/${item.speciality}`}
         onClick={handleScrollTop}
         className="flex flex-col items-center text-xs sm:text-sm cursor-pointer flex-shrink-0 group
-        transition-transform duration-300 ease-out hover:-translate-y-2"
+        transition-all duration-300 ease-out hover:-translate-y-3"
       >
         {/* Icon container */}
         <div
-          className="bg-gray-100 p-4 rounded-full
-          transition-all duration-300 ease-out
-          group-hover:shadow-lg group-hover:scale-105"
+          className="bg-gray-50 p-4 rounded-full shadow-sm border border-gray-100
+          transition-all duration-500 ease-out
+          group-hover:shadow-premium group-hover:scale-110 group-hover:border-primary/20 group-hover:bg-blue-50/50"
         >
           <img
             className="w-14 sm:w-20 object-contain"

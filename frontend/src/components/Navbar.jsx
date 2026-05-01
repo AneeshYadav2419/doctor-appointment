@@ -132,7 +132,7 @@ const Navbar = () => {
   };
 
   return (
-    <div className="flex items-center justify-between text-sm py-2 mb-5 border-b border-b-gray-400">
+    <div className="sticky top-0 z-50 bg-white/80 backdrop-blur-md flex items-center justify-between text-sm py-3 mb-5 border-b border-b-gray-200 shadow-sm transition-all duration-300 px-4 md:px-0">
 
       {/* Logo */}
       <img
@@ -157,7 +157,7 @@ const Navbar = () => {
         {/* Desktop Admin Button */}
         <button
           onClick={openAdminPanel}
-          className="border border-gray-300 px-5 py-2 rounded-full hidden md:block hover:bg-gray-100 transition"
+          className="border border-gray-300 px-5 py-2 rounded-full hidden md:block hover:bg-gray-100 hover:shadow-sm transition-all duration-300"
         >
           Admin Panel
         </button>
@@ -210,7 +210,7 @@ const Navbar = () => {
         ) : (
           <button
             onClick={() => navigate("/login")}
-            className="bg-primary text-white px-8 py-3 rounded-full font-light hidden md:block"
+            className="bg-gradient-to-r from-primary to-primary-dark text-white px-8 py-3 rounded-full font-light hidden md:block hover:scale-105 hover:shadow-premium transition-all duration-300"
           >
             Create Account
           </button>

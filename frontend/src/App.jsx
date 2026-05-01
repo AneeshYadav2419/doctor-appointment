@@ -1,38 +1,53 @@
-import React from 'react'
+import React, { Suspense, lazy } from 'react'
 import { Route, Routes } from 'react-router-dom'
-import Doctors from './pages/Doctors'
-import Login from './pages/Login'
-import About from './pages/About'
-import Contact from './pages/Contact'
-import MyProfile from './pages/MyProfile'
-import MyAppointments from './pages/MyAppointments'
-import Appointments from './pages/Appointments'
 import Navbar from './components/Navbar'
-import Home from './pages/Home'
 import Footer from './components/Footer'
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css'
+import ErrorBoundary from './components/ErrorBoundary';
+
+// Lazy loaded components
+const Home = lazy(() => import('./pages/Home'))
+const Doctors = lazy(() => import('./pages/Doctors'))
+const Login = lazy(() => import('./pages/Login'))
+const About = lazy(() => import('./pages/About'))
+const Contact = lazy(() => import('./pages/Contact'))
+const MyProfile = lazy(() => import('./pages/MyProfile'))
+const MyAppointments = lazy(() => import('./pages/MyAppointments'))
+const Appointments = lazy(() => import('./pages/Appointments'))
+
+// Loading fallback component
+const PageLoader = () => (
+  <div className="flex justify-center items-center min-h-[50vh]">
+    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+  </div>
+);
 
 const App = () => {
   return (
-    <div className='mx-4 sm:mx-[10%]'>
+    <div className='mx-4 sm:mx-[10%] flex flex-col min-h-screen'>
       <ToastContainer />
       <Navbar />
 
-      <Routes>
-        <Route path='/' element={<Home />} />
-        <Route path='/doctors' element={<Doctors />} />
-        <Route path='/doctors/:speciality' element={<Doctors />} />   
-        <Route path='/login' element={<Login />} />
-        <Route path='/about' element={<About />} />
-        <Route path='/contact' element={<Contact />} />
-        <Route path='/my-profile' element={<MyProfile />} />
-        <Route path='/my-appointments' element={<MyAppointments />} />
-        <Route path='/appointment/:docId' element={<Appointments />} />
-      </Routes>
+      <main className='flex-grow'>
+        <ErrorBoundary>
+          <Suspense fallback={<PageLoader />}>
+            <Routes>
+              <Route path='/' element={<Home />} />
+              <Route path='/doctors' element={<Doctors />} />
+              <Route path='/doctors/:speciality' element={<Doctors />} />   
+              <Route path='/login' element={<Login />} />
+              <Route path='/about' element={<About />} />
+              <Route path='/contact' element={<Contact />} />
+              <Route path='/my-profile' element={<MyProfile />} />
+              <Route path='/my-appointments' element={<MyAppointments />} />
+              <Route path='/appointment/:docId' element={<Appointments />} />
+            </Routes>
+          </Suspense>
+        </ErrorBoundary>
+      </main>
+
       <Footer />
-
-
     </div>
   )
 }

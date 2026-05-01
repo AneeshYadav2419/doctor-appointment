@@ -77,16 +77,17 @@ const TopDoctors = () => {
           <div
             key={item._id}
             onClick={() => handleNavigate(item._id)}
-            className="bg-white border border-blue-100 rounded-xl overflow-hidden cursor-pointer transition-transform duration-300 hover:-translate-y-2 hover:shadow-md"
+            className="bg-white border border-blue-50 rounded-xl overflow-hidden cursor-pointer transition-all duration-500 ease-out hover:-translate-y-3 hover:shadow-premium hover:border-primary/30 group"
           >
 
             {/* Image container */}
-            <div className="w-full aspect-[4/5] bg-blue-50 overflow-hidden">
+            <div className="w-full aspect-[4/5] bg-blue-50/50 overflow-hidden relative">
+              <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               <img
                 src={item.image}
                 alt={item.name}
                 loading="lazy"
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
               />
             </div>
 
@@ -117,10 +118,9 @@ const TopDoctors = () => {
         ))}
       </div>
 
-      {/* More Button */}
       <button
         onClick={handleMoreDoctors}
-        className="mt-12 bg-blue-50 text-gray-700 px-10 py-3 rounded-full hover:bg-blue-100 transition"
+        className="mt-12 bg-blue-50 text-gray-700 px-10 py-3 rounded-full font-medium hover:bg-primary hover:text-white hover:shadow-premium transition-all duration-300 hover:-translate-y-1"
       >
         More
       </button>

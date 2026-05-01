@@ -1,6 +1,8 @@
 import { createContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import axios from 'axios'
+
+// create context
 export const AppContext = createContext()
 
 
