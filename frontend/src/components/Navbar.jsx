@@ -1,286 +1,254 @@
-// import React, { useContext, useState } from 'react'
-// import { assets } from '../assets/assets'
-// // import { assets } from "../assets/assets";
-// import { NavLink, useNavigate } from 'react-router-dom'
-// import { AppContext } from '../context/AppContext'
-
-
-// const Navbar = () => {
-//   const navigate = useNavigate()
-//   const [showMenu, setShowMenu] = useState(false)
-//   const { token, setToken, userData } = useContext(AppContext)
-
-//   const logout = () => {
-//     setToken(false)
-//     localStorage.removeItem('token')
-//   }
-//   return (
-
-//     <div className='flex items-center justify-between text-sm py-2 mb-5 border-b border-b-gray-400'>
-//       <img onClick={() => navigate('/')} className='w-44 cursor-pointer' src={assets.logo} alt='' />
-
-
-//       <ul className='hidden md:flex items-start gap-5 font-medium'>
-//         <NavLink to="/">
-//           <li className='py-1'>HOME</li>
-//           <hr className='border-none outline-none h-0.5 bg-primary w-3/5 m-auto hidden' />
-//         </NavLink>
-//         <NavLink to="/doctors">
-//           <li className='py-1'>ALL DOCTORS</li>
-//           <hr className='border-none outline-none h-0.5 bg-primary w-3/5 m-auto hidden' />
-//         </NavLink>
-//         <NavLink to="/about">
-//           <li className='py-1'>ABOUT</li>
-//           <hr className='border-none outline-none h-0.5 bg-primary w-3/5 m-auto hidden' />
-//         </NavLink>
-//         <NavLink to="/contact">
-//           <li className='py-1'>CONTACT</li>
-//           <hr className='border-none outline-none h-0.5 bg-primary w-3/5 m-auto hidden' />
-//         </NavLink>
-//       </ul>
-
-//       <div className='flex items-center gap-4'>
-//         <button
-//           onClick={() => window.location.href = "https://doctor-appointment-8lnn.vercel.app"}
-//             className="border border-gray-300 px-5 py-2 rounded-full hidden md:block hover:bg-gray-100 transition">
-//           Admin Panel
-//         </button>
-
-//         {
-//           token && userData
-//             ? <div className='flex items-center gap-2 cursor-pointer group relative'>
-//               <img className='w-8 rounded-full' src={userData.image} alt='' />
-//               <img className='w-2.5' src={assets.dropdown_icon} alt='' />
-//               <div className='absolute top-0 right-0 pt-14 text-base font-medium text-gray-600 z-20 hidden group-hover:block'>
-//                 <div className='min-w-48 bg-stone-100 rounded flex flex-col gap-4 p-4'>
-//                   <p onClick={() => navigate('my-profile')} className='hover:text-black cursor-pointer'>My Profile</p>
-//                   <p onClick={() => navigate('my-appointments')} className='hover:text-black cursor-pointer'>My Appointments</p>
-//                   <p onClick={logout} className='hover:text-black cursor-pointer'>Logout</p>
-//                 </div>
-//               </div>
-//             </div> :
-//             <button onClick={() => navigate('/login')} className='bg-primary text-white px-8 py-3 rounded-full font-light hidden md:block'>Create Account</button>
-//         }
-
-//         <img onClick={() => setShowMenu(true)} className='w-6 md:hidden' src={assets.menu_icon} alt='' />
-
-//         {/* Mobile Menu */}
-//         <div className={`${showMenu ? 'fixed w-full' : 'h-0 w-0'} md:hidden right-0 top-0 bottom-0 z-20 overflow-hidden bg-white transition-all`}>
-//           <div className='flex items-center justify-between px-5 py-6'>
-//             <img className='w-36' src={assets.logo} alt='' />
-//             <img className='w-7 ' onClick={() => setShowMenu(false)} src={assets.cross_icon} alt='' />
-//           </div>
-//           <ul className='flex flex-col items-center gap-2 mt-5 px-5 text-lg font-medium'>
-//             <NavLink onClick={() => setShowMenu(false)} to="/"><p className="px-4 py-2 rounded inline-block">Home</p></NavLink>
-//             <NavLink onClick={() => setShowMenu(false)} to="/doctors"><p className="px-4 py-2 rounded inline-block">ALL DOCTORS</p></NavLink>
-//             <NavLink onClick={() => setShowMenu(false)} to="/about"><p className="px-4 py-2 rounded inline-block">ABOUT</p></NavLink>
-//             <NavLink onClick={() => setShowMenu(false)} to="/contact"><p className="px-4 py-2 rounded inline-block">CONTACT</p></NavLink>
-//           </ul>
-
-//           <button
-//             onClick={() => {
-//               setShowMenu(false);
-//               window.location.href =
-//                 "https://doctor-appointment-8lnn.vercel.app";
-//             }}
-//             className="border  px-6 py-2 rounded-full mt-4"
-//           >
-//             Admin Panel
-//           </button>
-
-
-//         </div>
-
-//       </div>
-
-//     </div>
-
-
-
-//   )
-// }
-
-// export default Navbar
-
-import React, { useContext, useState, useCallback } from "react";
+import React, { useContext, useState, useCallback, useEffect } from "react";
 import { assets } from "../assets/assets";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import { AppContext } from "../context/AppContext";
 
 const navLinks = [
-  { name: "HOME", path: "/" },
-  { name: "ALL DOCTORS", path: "/doctors" },
-  { name: "ABOUT", path: "/about" },
-  { name: "CONTACT", path: "/contact" },
+  { name: "Home", path: "/" },
+  { name: "All Doctors", path: "/doctors" },
+  { name: "About", path: "/about" },
+  { name: "Contact", path: "/contact" },
 ];
 
 const ADMIN_URL = "https://doctor-appointment-8lnn.vercel.app";
 
 const Navbar = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [showMenu, setShowMenu] = useState(false);
-
+  const [scrolled, setScrolled] = useState(false);
   const { token, setToken, userData } = useContext(AppContext);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 12);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    setShowMenu(false);
+  }, [location.pathname]);
 
   const logout = useCallback(() => {
     setToken(false);
     localStorage.removeItem("token");
   }, [setToken]);
 
-  const openAdminPanel = () => {
-    window.location.href = ADMIN_URL;
-  };
-
   return (
-    <div className="sticky top-0 z-50 bg-white/80 backdrop-blur-md flex items-center justify-between text-sm py-3 mb-5 border-b border-b-gray-200 shadow-sm transition-all duration-300 px-4 md:px-0">
+    <>
+      <header
+        className={`sticky top-0 z-50 transition-all duration-300 ${
+          scrolled
+            ? "bg-white/90 backdrop-blur-xl shadow-[0_1px_0_0_#E2E8F0]"
+            : "bg-white/80 backdrop-blur-md"
+        }`}
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
 
-      {/* Logo */}
-      <img
-        onClick={() => navigate("/")}
-        className="w-44 cursor-pointer"
-        src={assets.logo}
-        alt="logo"
-      />
-
-      {/* Desktop Navigation */}
-      <ul className="hidden md:flex items-start gap-5 font-medium">
-        {navLinks.map((link) => (
-          <NavLink key={link.path} to={link.path}>
-            <li className="py-1">{link.name}</li>
-            <hr className="border-none outline-none h-0.5 bg-primary w-3/5 m-auto hidden" />
-          </NavLink>
-        ))}
-      </ul>
-
-      <div className="flex items-center gap-4">
-
-        {/* Desktop Admin Button */}
-        <button
-          onClick={openAdminPanel}
-          className="border border-gray-300 px-5 py-2 rounded-full hidden md:block hover:bg-gray-100 hover:shadow-sm transition-all duration-300"
-        >
-          Admin Panel
-        </button>
-
-        {/* User Section */}
-        {token && userData ? (
-          <div className="flex items-center gap-2 cursor-pointer group relative">
-
-            <img
-              className="w-8 rounded-full"
-              src={userData.image}
-              alt="user"
-            />
-
-            <img
-              className="w-2.5"
-              src={assets.dropdown_icon}
-              alt="dropdown"
-            />
-
-            {/* Dropdown */}
-            <div className="absolute top-0 right-0 pt-14 text-base font-medium text-gray-600 z-20 hidden group-hover:block">
-              <div className="min-w-48 bg-stone-100 rounded flex flex-col gap-4 p-4">
-
-                <p
-                  onClick={() => navigate("my-profile")}
-                  className="hover:text-black cursor-pointer"
-                >
-                  My Profile
-                </p>
-
-                <p
-                  onClick={() => navigate("my-appointments")}
-                  className="hover:text-black cursor-pointer"
-                >
-                  My Appointments
-                </p>
-
-                <p
-                  onClick={logout}
-                  className="hover:text-black cursor-pointer"
-                >
-                  Logout
-                </p>
-
-              </div>
-            </div>
-
-          </div>
-        ) : (
+          {/* Logo */}
           <button
-            onClick={() => navigate("/login")}
-            className="bg-gradient-to-r from-primary to-primary-dark text-white px-8 py-3 rounded-full font-light hidden md:block hover:scale-105 hover:shadow-premium transition-all duration-300"
+            onClick={() => navigate("/")}
+            className="flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-lg"
+            aria-label="Go to homepage"
           >
-            Create Account
+            <img src={assets.logo} alt="Medilink" className="h-8 w-auto" />
           </button>
-        )}
 
-        {/* Mobile Menu Icon */}
-        <img
-          onClick={() => setShowMenu(true)}
-          className="w-6 md:hidden cursor-pointer"
-          src={assets.menu_icon}
-          alt="menu"
-        />
-
-        {/* Mobile Menu */}
-        <div
-          className={`${
-            showMenu ? "fixed w-full" : "h-0 w-0"
-          } md:hidden right-0 top-0 bottom-0 z-20 overflow-hidden bg-white transition-all`}
-        >
-
-          {/* Mobile Header */}
-          <div className="flex items-center justify-between px-5 py-6 border-b">
-
-            <img
-              className="w-36"
-              src={assets.logo}
-              alt="logo"
-            />
-
-            <img
-              className="w-7 cursor-pointer"
-              onClick={() => setShowMenu(false)}
-              src={assets.cross_icon}
-              alt="close"
-            />
-
-          </div>
-
-          {/* Mobile Links */}
-          <ul className="flex flex-col items-center gap-3 mt-6 px-5 text-lg font-medium">
-
+          {/* Desktop Nav */}
+          <nav className="hidden md:flex items-center gap-1" aria-label="Primary navigation">
             {navLinks.map((link) => (
               <NavLink
                 key={link.path}
-                onClick={() => setShowMenu(false)}
                 to={link.path}
+                end={link.path === "/"}
+                className={({ isActive }) =>
+                  `relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                    isActive
+                      ? "text-primary bg-primary-light"
+                      : "text-text-secondary hover:text-text-primary hover:bg-slate-100"
+                  }`
+                }
               >
-                <p className="px-4 py-2 rounded inline-block hover:bg-gray-100">
-                  {link.name}
-                </p>
+                {link.name}
               </NavLink>
             ))}
+          </nav>
 
-            {/* Mobile Admin Panel */}
+          {/* Right actions */}
+          <div className="flex items-center gap-3">
             <button
-              onClick={() => {
-                setShowMenu(false);
-                openAdminPanel();
-              }}
-              className="border border-gray-300 px-6 py-2 rounded-full mt-4 items-center hover:bg-gray-100 transition"
+              onClick={() => (window.location.href = ADMIN_URL)}
+              className="hidden md:inline-flex btn btn-ghost btn-sm text-xs"
             >
               Admin Panel
             </button>
 
-          </ul>
+            {token && userData ? (
+              <div className="relative group">
+                <button
+                  className="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-full border border-slate-200 hover:border-primary hover:bg-primary-light transition-all duration-200"
+                  aria-label="User menu"
+                >
+                  <img
+                    className="w-7 h-7 rounded-full object-cover ring-2 ring-primary/20"
+                    src={userData.image}
+                    alt={userData.name || "User"}
+                  />
+                  <span className="text-sm font-medium text-text-secondary hidden sm:block max-w-[100px] truncate">
+                    {userData.name?.split(" ")[0]}
+                  </span>
+                  <svg className="w-3.5 h-3.5 text-text-muted" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" />
+                  </svg>
+                </button>
 
+                {/* Dropdown */}
+                <div className="absolute right-0 top-full pt-2 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 z-50">
+                  <div className="w-52 bg-white rounded-2xl shadow-card-lg border border-slate-100 p-2 overflow-hidden">
+                    <div className="px-3 py-2 mb-1 border-b border-slate-100">
+                      <p className="text-xs text-text-muted font-medium">Signed in as</p>
+                      <p className="text-sm font-semibold text-text-primary truncate">{userData.name}</p>
+                    </div>
+                    {[
+                      { label: "My Profile", path: "/my-profile", icon: "👤" },
+                      { label: "My Appointments", path: "/my-appointments", icon: "📅" },
+                    ].map((item) => (
+                      <button
+                        key={item.path}
+                        onClick={() => navigate(item.path)}
+                        className="w-full flex items-center gap-3 px-3 py-2 text-sm text-text-secondary hover:bg-slate-50 hover:text-text-primary rounded-lg transition-colors duration-150"
+                      >
+                        <span>{item.icon}</span>
+                        {item.label}
+                      </button>
+                    ))}
+                    <div className="my-1 border-t border-slate-100" />
+                    <button
+                      onClick={logout}
+                      className="w-full flex items-center gap-3 px-3 py-2 text-sm text-danger hover:bg-red-50 rounded-lg transition-colors duration-150"
+                    >
+                      <span>🚪</span>
+                      Logout
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <button
+                onClick={() => navigate("/login")}
+                className="hidden md:inline-flex btn btn-primary btn-sm shine"
+              >
+                Get Started
+              </button>
+            )}
+
+            {/* Hamburger */}
+            <button
+              onClick={() => setShowMenu(true)}
+              className="md:hidden p-2 rounded-lg text-text-secondary hover:bg-slate-100 transition-colors"
+              aria-label="Open menu"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* Mobile Menu Overlay */}
+      {showMenu && (
+        <div
+          className="fixed inset-0 z-[60] bg-black/40 backdrop-blur-sm md:hidden"
+          onClick={() => setShowMenu(false)}
+        />
+      )}
+
+      {/* Mobile Drawer */}
+      <aside
+        className={`fixed top-0 right-0 bottom-0 w-72 z-[70] bg-white shadow-2xl transform transition-transform duration-300 ease-out md:hidden ${
+          showMenu ? "translate-x-0" : "translate-x-full"
+        }`}
+      >
+        <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
+          <img src={assets.logo} alt="Medilink" className="h-7 w-auto" />
+          <button
+            onClick={() => setShowMenu(false)}
+            className="p-2 rounded-lg hover:bg-slate-100 text-text-secondary transition-colors"
+            aria-label="Close menu"
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         </div>
 
-      </div>
-    </div>
+        {token && userData && (
+          <div className="mx-4 mt-4 p-3 rounded-xl bg-gradient-card flex items-center gap-3">
+            <img className="w-10 h-10 rounded-full object-cover" src={userData.image} alt={userData.name} />
+            <div className="min-w-0">
+              <p className="text-sm font-semibold text-text-primary truncate">{userData.name}</p>
+              <p className="text-xs text-text-muted truncate">{userData.email}</p>
+            </div>
+          </div>
+        )}
+
+        <nav className="p-4 flex flex-col gap-1">
+          {navLinks.map((link) => (
+            <NavLink
+              key={link.path}
+              to={link.path}
+              end={link.path === "/"}
+              className={({ isActive }) =>
+                `block px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                  isActive
+                    ? "bg-primary-light text-primary"
+                    : "text-text-secondary hover:bg-slate-50 hover:text-text-primary"
+                }`
+              }
+            >
+              {link.name}
+            </NavLink>
+          ))}
+
+          {token && userData ? (
+            <>
+              <div className="my-2 border-t border-slate-100" />
+              <NavLink to="/my-profile" className="block px-4 py-3 rounded-xl text-sm font-medium text-text-secondary hover:bg-slate-50">
+                👤 My Profile
+              </NavLink>
+              <NavLink to="/my-appointments" className="block px-4 py-3 rounded-xl text-sm font-medium text-text-secondary hover:bg-slate-50">
+                📅 My Appointments
+              </NavLink>
+              <div className="my-2 border-t border-slate-100" />
+              <button
+                onClick={logout}
+                className="block w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-danger hover:bg-red-50"
+              >
+                🚪 Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <div className="my-2 border-t border-slate-100" />
+              <button
+                onClick={() => navigate("/login")}
+                className="btn btn-primary w-full justify-center mt-2"
+              >
+                Get Started
+              </button>
+            </>
+          )}
+
+          <button
+            onClick={() => (window.location.href = ADMIN_URL)}
+            className="btn btn-ghost w-full justify-center mt-2 text-sm"
+          >
+            Admin Panel
+          </button>
+        </nav>
+      </aside>
+    </>
   );
 };
 

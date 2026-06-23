@@ -1,233 +1,108 @@
-// import React, { useContext } from 'react'
-// import { useNavigate } from 'react-router-dom'
-// import { AppContext } from '../context/AppContext'
-
-
-// const TopDoctors = () => {
-
-//     const navigate = useNavigate()
-//     const {doctors} = useContext(AppContext)
-
-//   return (
-//     <div className='flex flex-col items-center gap-4 my-16 text-gray-900 md:mx-10'>
-//         <h1 className='text-3xl font-medium'>Top Doctors to Book</h1>
-//         <p className='sm:w-1/3 text-center text-sm'>Simply browse through our extensive list of trusted doctors.</p>
-//         <div className='w-full grid grid-cols-auto gap-4 pt-5 gap-y-6 px-3 sm:px-0'>
-//             {doctors.slice(0,10).map((item,index) => (
-//             <div onClick={() => navigate(`/appointment/${item._id}`)} key={index} className='border  border-blue-200 rounded-xl overflow-hidden cursor-pointer hover:translate-y-[-10px] transition-all duration-500 '>
-//                 <img className='bg-blue-50' src={item.image} alt=''/>
-//                 <div className='p-4'>
-//                     <div className={`flex items-center gap-2 text-sm text-center ${item.available ? 'text-green-500' :'text-gray-500'}`}>
-//                         <p className={`w-2 h-2 ${item.available ? ' bg-green-500' : 'bg-gray-500'} rounded-full`}></p><p>{item.available ? 'Available' : 'Not Available'}</p>
-//                     </div>
-//                     <p className='text-gray-900 text-lg font-medium'>{item.name}</p>
-//                     <p className='text-gray-600 textt-sm'>{item.speciality}</p>
-//                 </div>
-//             </div>
-
-//             ))}
-//         </div>
-//         <button onClick={()=>{navigate('/doctors'); scrollTo(0,0)}} className='bg-blue-50 text-gray-600 px-12 py-3 rounded-full mt-10'>more</button>
-//     </div>
-//   )
-// }
-
-// export default TopDoctors
-
-
 import React, { useCallback, useContext, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { AppContext } from "../context/AppContext";
 
+const DoctorCard = React.memo(({ item, onClick }) => (
+  <div
+    onClick={() => onClick(item._id)}
+    className="doc-card group"
+    role="button"
+    tabIndex={0}
+    aria-label={`Book appointment with ${item.name}`}
+    onKeyDown={(e) => e.key === "Enter" && onClick(item._id)}
+  >
+    {/* Image */}
+    <div className="relative w-full aspect-[4/5] bg-gradient-card overflow-hidden">
+      <img
+        src={item.image}
+        alt={item.name}
+        loading="lazy"
+        className="doc-img w-full h-full object-cover"
+      />
+      {/* Overlay on hover */}
+      <div className="absolute inset-0 bg-gradient-to-t from-primary/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-400" />
+      {/* Availability badge */}
+      <div className="absolute top-3 left-3">
+        <span className={`badge ${item.available ? "badge-green" : "badge-slate"}`}>
+          <span className={`w-1.5 h-1.5 rounded-full ${item.available ? "bg-accent" : "bg-slate-400"}`} />
+          {item.available ? "Available" : "Unavailable"}
+        </span>
+      </div>
+    </div>
+
+    {/* Content */}
+    <div className="p-4">
+      <h3 className="text-sm font-bold text-text-primary group-hover:text-primary transition-colors duration-200 leading-tight">
+        {item.name}
+      </h3>
+      <p className="text-xs text-text-muted mt-1">{item.speciality}</p>
+
+      <div className="flex items-center justify-between mt-3 pt-3 border-t border-slate-100">
+        <div className="flex items-center gap-1">
+          <svg className="w-3.5 h-3.5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+          </svg>
+          <span className="text-xs font-semibold text-text-secondary">4.8</span>
+        </div>
+        <button className="text-[11px] font-semibold text-primary bg-primary-light px-2.5 py-1 rounded-full hover:bg-primary hover:text-white transition-all duration-200">
+          Book Now
+        </button>
+      </div>
+    </div>
+  </div>
+));
+DoctorCard.displayName = "DoctorCard";
+
 const TopDoctors = () => {
   const navigate = useNavigate();
   const { doctors } = useContext(AppContext);
-  //prevent unneccesary render 
-  const topDoctors = useMemo(() => doctors.slice(0, 10), [doctors])
+  const topDoctors = useMemo(() => doctors.slice(0, 10), [doctors]);
+
+  const handleNavigate = useCallback(
+    (id) => { navigate(`/appointment/${id}`); },
+    [navigate]
+  );
 
   const handleMoreDoctors = useCallback(() => {
     navigate("/doctors");
     window.scrollTo(0, 0);
   }, [navigate]);
 
-  // Stable navigation function
-  const handleNavigate = useCallback(
-    (id) => {
-      navigate(`/appointment/${id}`);
-    },
-    [navigate]
-  );
-
   return (
-    <section className="flex flex-col items-center my-20 px-4 sm:px-6 lg:px-12">
-
+    <section className="py-16 px-4">
       {/* Heading */}
-      <h1 className="text-3xl font-semibold text-gray-900 text-center">
-        Top Doctors to Book
-      </h1>
-
-      <p className="text-sm text-gray-600 text-center mt-2 max-w-xl">
-        Simply browse through our extensive list of trusted doctors.
-      </p>
-
-      {/* Doctors Grid */}
-      <div className="w-full mt-10 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
-
-        {topDoctors.slice(0, 10).map((item) => (
-          <div
-            key={item._id}
-            onClick={() => handleNavigate(item._id)}
-            className="bg-white border border-blue-50 rounded-xl overflow-hidden cursor-pointer transition-all duration-500 ease-out hover:-translate-y-3 hover:shadow-premium hover:border-primary/30 group"
-          >
-
-            {/* Image container */}
-            <div className="w-full aspect-[4/5] bg-blue-50/50 overflow-hidden relative">
-              <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              <img
-                src={item.image}
-                alt={item.name}
-                loading="lazy"
-                className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
-              />
-            </div>
-
-            {/* Content */}
-            <div className="p-3">
-
-              <div
-                className={`flex items-center gap-2 text-xs ${item.available ? "text-green-500" : "text-gray-500"
-                  }`}
-              >
-                <span
-                  className={`w-2 h-2 rounded-full ${item.available ? "bg-green-500" : "bg-gray-400"
-                    }`}
-                ></span>
-
-                <p>{item.available ? "Available" : "Not Available"}</p>
-              </div>
-
-              <p className="text-sm font-semibold text-gray-900 mt-1">
-                {item.name}
-              </p>
-
-              <p className="text-xs text-gray-600">
-                {item.speciality}
-              </p>
-            </div>
-          </div>
-        ))}
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
+        <div>
+          <span className="section-tag">
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.562.562 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
+            </svg>
+            Top Rated Doctors
+          </span>
+          <h2 className="section-title">Meet Our Best Doctors</h2>
+          <p className="section-subtitle">
+            Verified specialists with years of experience, ready to help you.
+          </p>
+        </div>
+        <button
+          onClick={handleMoreDoctors}
+          className="btn btn-secondary flex-shrink-0"
+        >
+          View All Doctors
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+          </svg>
+        </button>
       </div>
 
-      <button
-        onClick={handleMoreDoctors}
-        className="mt-12 bg-blue-50 text-gray-700 px-10 py-3 rounded-full font-medium hover:bg-primary hover:text-white hover:shadow-premium transition-all duration-300 hover:-translate-y-1"
-      >
-        More
-      </button>
+      {/* Grid */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-5">
+        {topDoctors.map((item) => (
+          <DoctorCard key={item._id} item={item} onClick={handleNavigate} />
+        ))}
+      </div>
     </section>
   );
 };
 
-export default React.memo(TopDoctors)
-
-// import React, { useContext, useMemo, useCallback } from "react";
-// import { useNavigate } from "react-router-dom";
-// import { AppContext } from "../context/AppContext";
-
-// const TopDoctors = () => {
-//   const navigate = useNavigate();
-//   const { doctors } = useContext(AppContext);
-
-//   // Memoize sliced doctors (avoid recalculating every render)
-//   const topDoctors = useMemo(() => doctors.slice(0, 10), [doctors]);
-
-//   // Stable navigation function
-//   const handleNavigate = useCallback(
-//     (id) => {
-//       navigate(`/appointment/${id}`);
-//     },
-//     [navigate]
-//   );
-
-//   const handleMoreDoctors = useCallback(() => {
-//     navigate("/doctors");
-//     window.scrollTo(0, 0);
-//   }, [navigate]);
-
-//   return (
-//     <section className="flex flex-col items-center my-20 px-4 sm:px-6 lg:px-12">
-
-//       {/* Heading */}
-//       <h1 className="text-3xl font-semibold text-gray-900 text-center">
-//         Top Doctors to Book
-//       </h1>
-
-//       <p className="text-sm text-gray-600 text-center mt-2 max-w-xl">
-//         Simply browse through our extensive list of trusted doctors.
-//       </p>
-
-//       {/* Doctors Grid */}
-//       <div className="w-full mt-10 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
-
-//         {topDoctors.map((item) => (
-//           <div
-//             key={item._id}
-//             onClick={() => handleNavigate(item._id)}
-//             className="bg-white border border-blue-100 rounded-xl overflow-hidden cursor-pointer transition-transform duration-300 hover:-translate-y-2 hover:shadow-md"
-//           >
-
-//             {/* Image */}
-//             <div className="w-full aspect-[4/5] bg-blue-50 overflow-hidden">
-//               <img
-//                 src={item.image}
-//                 alt={item.name}
-//                 loading="lazy"
-//                 className="w-full h-full object-cover"
-//               />
-//             </div>
-
-//             {/* Content */}
-//             <div className="p-3">
-
-//               <div
-//                 className={`flex items-center gap-2 text-xs ${
-//                   item.available ? "text-green-500" : "text-gray-500"
-//                 }`}
-//               >
-//                 <span
-//                   className={`w-2 h-2 rounded-full ${
-//                     item.available ? "bg-green-500" : "bg-gray-400"
-//                   }`}
-//                 ></span>
-
-//                 <p>{item.available ? "Available" : "Not Available"}</p>
-
-//               </div>
-
-//               <p className="text-sm font-semibold text-gray-900 mt-1">
-//                 {item.name}
-//               </p>
-
-//               <p className="text-xs text-gray-600">
-//                 {item.speciality}
-//               </p>
-
-//             </div>
-
-//           </div>
-//         ))}
-//       </div>
-
-//       {/* More Button */}
-//       <button
-//         onClick={handleMoreDoctors}
-//         className="mt-12 bg-blue-50 text-gray-700 px-10 py-3 rounded-full hover:bg-blue-100 transition"
-//       >
-//         More
-//       </button>
-
-//     </section>
-//   );
-// };
-
-// export default React.memo(TopDoctors);
+export default React.memo(TopDoctors);

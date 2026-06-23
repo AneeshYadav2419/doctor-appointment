@@ -1,93 +1,98 @@
-// import React from 'react'
-// import { specialityData } from '../assets/assets'
-// import { Link } from 'react-router-dom'
-
-// const SpecialityMenu = () => {
-//   return (
-//     <div className='flex flex-col items-center gap-4 py-16 text-gray-800' id='speciality'>
-//         <h1 className='text-3xl font-medium'>Find by Speciality</h1>
-//         <p className='sm:w-1/3 text-center text-sm'>Simply browse through our extensive list of trusted doctors, schedule your appointment hassle-free.</p>
-//         <div className='flex sm:justify-center gap-4 pt-5 w-full overflow-scroll'>
-//             {specialityData.map((item,index)=>( 
-//                 <Link onClick={() => scrollTo(0,0)} className='flex flex-col items-center text-xs cursor-pointer flex-shrink-0 hover:translate-y-[-10px]
-//                 transition-all duration-500 '
-//                  key={index} to={`/doctors/${item.speciality}`}>
-//                     <img className="w-16 sm:w-24 mb-2" src={item.image} alt=''/>
-//                     <p>{item.speciality}</p>
-//                 </Link>
-//             ))}
-//         </div>
-//     </div>
-//   )
-// }
-
-// export default SpecialityMenu
-
 import React, { useCallback, useMemo } from "react";
 import { specialityData } from "../assets/assets";
 import { Link } from "react-router-dom";
 
-const SpecialityMenu = () => {
+const ICONS = {
+  "General physician": "🩺",
+  "Gynecologist": "👩‍⚕️",
+  "Dermatologist": "🧴",
+  "Pediatricians": "👶",
+  "Neurologist": "🧠",
+  "Gastroenterologist": "🫁",
+};
 
+const COLORS = [
+  { bg: "bg-teal-50", ring: "ring-teal-200", icon: "text-teal-600", hover: "group-hover:bg-teal-100" },
+  { bg: "bg-sky-50", ring: "ring-sky-200", icon: "text-sky-600", hover: "group-hover:bg-sky-100" },
+  { bg: "bg-violet-50", ring: "ring-violet-200", icon: "text-violet-600", hover: "group-hover:bg-violet-100" },
+  { bg: "bg-pink-50", ring: "ring-pink-200", icon: "text-pink-600", hover: "group-hover:bg-pink-100" },
+  { bg: "bg-amber-50", ring: "ring-amber-200", icon: "text-amber-600", hover: "group-hover:bg-amber-100" },
+  { bg: "bg-green-50", ring: "ring-green-200", icon: "text-green-600", hover: "group-hover:bg-green-100" },
+];
+
+const SpecialityMenu = () => {
   const handleScrollTop = useCallback(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
-  const specialityList = useMemo(() => {
-    return specialityData.map((item) => (
-      <Link
-        key={item.speciality}
-        to={`/doctors/${item.speciality}`}
-        onClick={handleScrollTop}
-        className="flex flex-col items-center text-xs sm:text-sm cursor-pointer flex-shrink-0 group
-        transition-all duration-300 ease-out hover:-translate-y-3"
-      >
-        {/* Icon container */}
-        <div
-          className="bg-gray-50 p-4 rounded-full shadow-sm border border-gray-100
-          transition-all duration-500 ease-out
-          group-hover:shadow-premium group-hover:scale-110 group-hover:border-primary/20 group-hover:bg-blue-50/50"
+  const cards = useMemo(() =>
+    specialityData.map((item, idx) => {
+      const color = COLORS[idx % COLORS.length];
+      return (
+        <Link
+          key={item.speciality}
+          to={`/doctors/${item.speciality}`}
+          onClick={handleScrollTop}
+          className="group flex flex-col items-center gap-3 min-w-[130px] sm:min-w-[150px] cursor-pointer flex-shrink-0 animate-slide-up"
+          style={{ animationDelay: `${idx * 0.07}s` }}
+          aria-label={`Browse ${item.speciality} doctors`}
         >
-          <img
-            className="w-14 sm:w-20 object-contain"
-            src={item.image}
-            alt={item.speciality}
-            loading="lazy"
-          />
-        </div>
+          {/* Icon circle */}
+          <div
+            className={`relative w-20 h-20 sm:w-24 sm:h-24 rounded-2xl ${color.bg} ring-2 ${color.ring} ring-offset-1
+            flex items-center justify-center transition-all duration-300
+            group-hover:scale-110 group-hover:shadow-card-md group-hover:ring-offset-2`}
+          >
+            {/* emoji fallback if image fails */}
+            <img
+              src={item.image}
+              alt={item.speciality}
+              loading="lazy"
+              className="w-12 h-12 sm:w-16 sm:h-16 object-contain transition-transform duration-300 group-hover:scale-105"
+              onError={(e) => {
+                e.target.style.display = "none";
+                e.target.nextSibling.style.display = "flex";
+              }}
+            />
+            <span
+              className={`hidden text-3xl w-full h-full items-center justify-center ${color.icon}`}
+            >
+              {ICONS[item.speciality] || "🏥"}
+            </span>
 
-        {/* Speciality Name */}
-        <p
-          className="mt-2 font-medium text-gray-700
-          transition-colors duration-300 ease-out
-          group-hover:text-primary"
-        >
-          {item.speciality}
-        </p>
-      </Link>
-    ));
-  }, [handleScrollTop]);
+            {/* hover glow */}
+            <div className={`absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${color.hover}`} />
+          </div>
+
+          {/* Label */}
+          <p className="text-xs sm:text-sm font-semibold text-text-secondary text-center leading-tight transition-colors duration-200 group-hover:text-primary">
+            {item.speciality}
+          </p>
+        </Link>
+      );
+    }),
+  [handleScrollTop]);
 
   return (
-    <section
-      id="speciality"
-      className="flex flex-col items-center gap-6 py-16 px-4 text-gray-800"
-    >
+    <section id="speciality" className="py-16 px-4">
       {/* Heading */}
-      <h1 className="text-3xl md:text-4xl font-semibold text-center">
-        Find by Speciality
-      </h1>
+      <div className="text-center mb-10">
+        <span className="section-tag">
+          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+          </svg>
+          Browse by Speciality
+        </span>
+        <h2 className="section-title">Find the Right Specialist</h2>
+        <p className="section-subtitle mx-auto">
+          Browse our network of expert doctors across 30+ specialities. Book an appointment in minutes.
+        </p>
+      </div>
 
-      {/* Description */}
-      <p className="text-sm md:text-base text-center max-w-xl text-gray-600">
-        Simply browse through our extensive list of trusted doctors,
-        schedule your appointment hassle-free.
-      </p>
-
-      {/* Speciality List */}
-      <div className="w-full overflow-x-auto scrollbar-hide">
-        <div className="flex sm:justify-center gap-6 pt-6 min-w-max">
-          {specialityList}
+      {/* Scrollable cards */}
+      <div className="overflow-x-auto scrollbar-hide -mx-4 px-4">
+        <div className="flex sm:justify-center gap-5 sm:gap-6 pb-4 min-w-max sm:min-w-0 sm:flex-wrap">
+          {cards}
         </div>
       </div>
     </section>
