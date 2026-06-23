@@ -1,169 +1,355 @@
-# 🩺 Medilink – Doctor Appointment Booking System
+<div align="center">
 
-A full-stack **Doctor Appointment Booking Platform** built using the **MERN Stack (MongoDB, Express, React, Node.js)**.
+# 🩺 Medilink
+### Doctor Appointment Booking Platform
 
-Medilink allows patients to book appointments online and provides **User, Doctor, and Admin dashboards** with complete role-based functionality.
+[![React](https://img.shields.io/badge/React-Frontend-61DAFB?style=for-the-badge&logo=react)](https://reactjs.org/)
+[![Node.js](https://img.shields.io/badge/Node.js-Backend-green?style=for-the-badge&logo=node.js)](https://nodejs.org/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-Database-47A248?style=for-the-badge&logo=mongodb)](https://mongodb.com/)
+[![Razorpay](https://img.shields.io/badge/Razorpay-Payments-02042B?style=for-the-badge&logo=razorpay)](https://razorpay.com/)
+[![Cloudinary](https://img.shields.io/badge/Cloudinary-Media-3448C5?style=for-the-badge&logo=cloudinary)](https://cloudinary.com/)
+[![License](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)](LICENSE)
+
+<br/>
+
+> **Book · Manage · Heal**
+>
+> A production-ready full-stack doctor appointment booking platform — where patients book instantly, doctors manage seamlessly, and admins oversee everything from one place.
+
+<br/>
+
+**[🚀 Live Demo – Patient Portal](https://your-vercel-url.vercel.app)** · **[⚙️ Admin Panel](https://your-admin-url.vercel.app)** · **[📦 Backend API](https://your-render-url.onrender.com)**
+
+<br/>
+
+[✨ Features](#-features) · [🏗️ Architecture](#️-architecture) · [🛠️ Tech Stack](#️-tech-stack) · [⚡ Quick Start](#-quick-start) · [📡 API Reference](#-api-reference) · [🔮 Roadmap](#-roadmap)
+
+</div>
 
 ---
 
-## 🚀 Overview
+## 🎯 What Is Medilink?
 
-This project demonstrates:
-- Full-stack development
-- Authentication & authorization
-- Payment gateway integration
-- Cloud storage handling
-- Dashboard management system
+Booking a doctor appointment shouldn't require a phone call. **Medilink** brings the entire experience online — patients find doctors, book slots, and pay securely in minutes. Doctors get a personal dashboard to manage their schedule and earnings. Admins control the entire platform from a single panel.
+
+Built on the **MERN Stack** with **Razorpay payments** and **Cloudinary media storage**, Medilink is a complete, deployment-ready healthcare booking solution.
 
 ---
 
 ## ✨ Features
 
-### 👤 User Features
-- 🔐 User registration & login  
-- 📅 Book doctor appointments  
-- 📜 View appointment history  
-- ❌ Cancel appointments  
-- 👤 Edit profile & upload image  
-- 💳 Online payment support  
-
----
+### 👤 Patient Portal
+- Secure registration & login with JWT
+- Browse & search doctors by specialty
+- Book appointments with available time slots
+- Online payment via Razorpay
+- View complete appointment history
+- Cancel appointments
+- Edit profile & upload profile photo
 
 ### 🩺 Doctor Dashboard
-- 🔑 Doctor login  
-- 📊 View dashboard & earnings  
-- 📅 Manage appointments  
-- 👥 View patient details  
-- ⚙️ Update profile  
+- Dedicated doctor login & profile
+- Earnings overview & analytics
+- View & manage all appointments
+- Access patient details per appointment
+- Update availability & profile info
+
+### 🛡️ Admin Panel
+- Platform-wide dashboard & analytics
+- Add, edit & manage doctor listings
+- Monitor all appointments across the platform
+- Track total system earnings
+- Real-time platform activity overview
 
 ---
 
-### 🛠 Admin Panel
-- 📊 Admin dashboard  
-- ➕ Add new doctors  
-- 📋 Manage doctor list  
-- 📅 View all appointments  
-- 💰 Track system earnings  
-- 📈 Monitor platform activity  
+## 🏗️ Architecture
+
+```
+┌──────────────────────┐    ┌──────────────────────┐
+│   Patient Frontend   │    │    Admin Panel        │
+│   React + Tailwind   │    │   React + Tailwind    │
+└──────────┬───────────┘    └──────────┬────────────┘
+           │                           │
+           └──────────┬────────────────┘
+                      │ REST API (JWT Auth)
+           ┌──────────▼────────────────┐
+           │      Backend API          │
+           │   Node.js + Express.js    │
+           └──────────┬────────────────┘
+                      │
+        ┌─────────────┼──────────────┐
+        │             │              │
+┌───────▼──────┐ ┌────▼────┐ ┌──────▼──────┐
+│   MongoDB    │ │Razorpay │ │ Cloudinary  │
+│    Atlas     │ │Payments │ │   Media     │
+└──────────────┘ └─────────┘ └─────────────┘
+```
+
+### Design Principles
+- **3-App Architecture** — Patient frontend, Admin panel, and Backend are independently deployable
+- **Role-Based Access** — Separate auth flows for Patient, Doctor, and Admin
+- **Service Isolation** — Payments, media, and database are independent services
+- **Cloud-Native** — Built for Vercel + Render + MongoDB Atlas from day one
 
 ---
 
-## 💳 Payment Integration
-Integrated **Razorpay** for secure transactions:
+## 📁 Project Structure
 
-- ✔️ Secure payment gateway  
-- ✔️ Payment verification  
-- ✔️ Appointment confirmation  
-
----
-
-## ☁️ Image Upload
-Using **Cloudinary** for image storage:
-
-- 📤 Profile image uploads  
-- ⚡ Fast delivery (CDN)  
-- 🔒 Secure storage  
-
----
-
-## 🗄 Database
-**MongoDB** is used to store:
-- Users  
-- Doctors  
-- Appointments  
-- Payments  
-- Profile data  
-
----
-
-## 🧰 Tech Stack
-
-### Frontend
-- React.js  
-- Tailwind CSS  
-- React Router  
-- Axios  
-
-### Backend
-- Node.js  
-- Express.js  
-- JWT Authentication  
-
-### Database
-- MongoDB  
-
-### Third-Party Services
-- Razorpay (Payments)  
-- Cloudinary (Image Upload)  
-
----
-
-## 🏗 Project Structure
-
-```bash
+```
 Medilink/
 │
-├── frontend/   # User Website (React)
-├── admin/      # Admin Panel (React)
-├── backend/    # Node.js API Server
-└── README.md
+├── frontend/                        # Patient Website (React)
+│   └── src/
+│       ├── pages/                   # Home, Doctors, Appointments
+│       ├── components/              # Navbar, DoctorCard, etc.
+│       ├── context/                 # Global state management
+│       └── assets/
+│
+├── admin/                           # Admin + Doctor Panel (React)
+│   └── src/
+│       ├── pages/
+│       │   ├── admin/               # Dashboard, Doctors, Appointments
+│       │   └── doctor/              # Doctor dashboard, earnings
+│       ├── components/
+│       └── context/
+│
+└── backend/                         # Node.js API Server
+    └── src/
+        ├── controllers/             # Auth, Doctors, Appointments, Payments
+        ├── models/                  # User, Doctor, Appointment schemas
+        ├── routes/                  # API route definitions
+        ├── middlewares/             # JWT auth, role guards
+        └── config/                  # DB, Cloudinary, Razorpay config
 ```
 
 ---
 
-## 🔐 Key Functionalities
-- Role-based authentication  
-- REST API architecture  
-- Secure JWT login system  
-- Cloudinary image upload  
-- Razorpay payment integration  
-- Appointment booking system  
-- Dashboard analytics  
+## 🛠️ Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| **Patient Frontend** | React.js, Tailwind CSS, React Router, Axios |
+| **Admin Panel** | React.js, Tailwind CSS, React Router, Axios |
+| **Backend** | Node.js, Express.js |
+| **Database** | MongoDB, Mongoose ODM |
+| **Authentication** | JWT (JSON Web Tokens) |
+| **Payments** | Razorpay Payment Gateway |
+| **Media Storage** | Cloudinary (CDN-backed) |
+| **Deployment** | Vercel (Frontend) + Render (Backend) + MongoDB Atlas |
 
 ---
 
-## 🎯 Learning Outcomes
-Through this project, I learned:
+## ⚡ Quick Start
 
-- Full-stack MERN development  
-- REST API design  
-- Authentication & authorization  
-- Payment gateway integration  
-- Cloud storage handling  
-- Dashboard development  
-- Deployment (Render & Vercel)  
+### Prerequisites
+- Node.js v18+
+- MongoDB Atlas account (free tier)
+- Razorpay account (test keys)
+- Cloudinary account (free tier)
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/YOUR_USERNAME/medilink.git
+cd medilink
+```
+
+### 2. Backend Setup
+
+```bash
+cd backend
+npm install
+cp .env.example .env
+# Fill in your environment variables
+npm run dev
+```
+
+Backend runs on `http://localhost:5000`
+
+### 3. Frontend Setup
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Patient portal runs on `http://localhost:5173`
+
+### 4. Admin Panel Setup
+
+```bash
+cd admin
+npm install
+npm run dev
+```
+
+Admin panel runs on `http://localhost:5174`
 
 ---
 
-## 🌍 Deployment
-- Frontend & Admin → Vercel  
-- Backend → Render  
-- Database → MongoDB Atlas  
+## 🔧 Environment Variables
+
+### Backend (`backend/.env`)
+
+```env
+PORT=5000
+MONGODB_URI=mongodb+srv://...
+JWT_SECRET=your_jwt_secret
+
+# Cloudinary
+CLOUDINARY_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
+
+# Razorpay
+RAZORPAY_KEY_ID=your_key_id
+RAZORPAY_KEY_SECRET=your_key_secret
+
+# Frontend
+CLIENT_URL=http://localhost:5173
+ADMIN_URL=http://localhost:5174
+```
+
+### Frontend (`frontend/.env`)
+
+```env
+VITE_BACKEND_URL=http://localhost:5000
+VITE_RAZORPAY_KEY_ID=your_razorpay_key
+```
 
 ---
 
-## 🔮 Future Improvements
-- 🎥 Video consultation system  
-- 📧 Email notifications  
-- ⭐ Doctor ratings & reviews  
-- ⏰ Appointment reminders  
-- 💬 Real-time chat  
+## 📡 API Reference
+
+### Base URL
+```
+http://localhost:5000/api
+```
+
+### Auth Endpoints
+
+| Method | Endpoint | Role | Description |
+|--------|----------|------|-------------|
+| `POST` | `/user/register` | Patient | Register new patient |
+| `POST` | `/user/login` | Patient | Patient login |
+| `POST` | `/doctor/login` | Doctor | Doctor login |
+| `POST` | `/admin/login` | Admin | Admin login |
+
+### Appointment Endpoints
+
+| Method | Endpoint | Role | Description |
+|--------|----------|------|-------------|
+| `GET` | `/user/appointments` | Patient | Get my appointments |
+| `POST` | `/user/book-appointment` | Patient | Book an appointment |
+| `POST` | `/user/cancel-appointment` | Patient | Cancel appointment |
+| `GET` | `/doctor/appointments` | Doctor | Get doctor's appointments |
+| `GET` | `/admin/appointments` | Admin | Get all appointments |
+
+### Payment Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/user/payment-razorpay` | Initiate Razorpay payment |
+| `POST` | `/user/verify-razorpay` | Verify payment & confirm booking |
+
+---
+
+## 💳 Payment Flow
+
+```
+Patient selects slot
+        ↓
+Razorpay checkout opens
+        ↓
+Payment processed securely
+        ↓
+Webhook verifies payment
+        ↓
+Appointment confirmed ✅
+```
+
+---
+
+## ☁️ Media Handling
+
+All profile images (patients & doctors) are stored on **Cloudinary**:
+- Automatic optimization & compression
+- CDN-backed fast delivery globally
+- Secure upload with signed URLs
+- No server storage required
+
+---
+
+## 🔐 Security
+
+| Layer | Implementation |
+|-------|---------------|
+| Authentication | JWT tokens with expiry |
+| Role Guards | Middleware-based RBAC for Patient / Doctor / Admin |
+| Payment Security | Razorpay signature verification on every transaction |
+| Media Security | Cloudinary signed uploads |
+| Password Storage | Bcrypt hashing |
+
+---
+
+## 🔮 Roadmap
+
+- [x] JWT role-based authentication (Patient / Doctor / Admin)
+- [x] Doctor listing & appointment booking
+- [x] Razorpay payment integration
+- [x] Cloudinary profile image upload
+- [x] Admin & Doctor dashboards
+- [x] Appointment cancellation
+- [ ] 🎥 Video consultation (WebRTC)
+- [ ] 📧 Email notifications (booking confirmation, reminders)
+- [ ] ⭐ Doctor ratings & reviews
+- [ ] ⏰ Appointment reminders (SMS / Push)
+- [ ] 💬 Real-time chat (Socket.io)
+- [ ] 📱 Mobile app (React Native)
+- [ ] 🔍 Advanced doctor search & filters
+
+---
+
+## 💡 Key Engineering Decisions
+
+| Decision | Rationale |
+|----------|-----------|
+| 3-App structure | Patient, Admin, Backend independently deployable & scalable |
+| JWT over sessions | Stateless auth — works seamlessly across Vercel + Render |
+| Cloudinary for media | Eliminates server storage; CDN ensures fast global delivery |
+| Razorpay over Stripe | Better support for Indian payment ecosystem |
+| MongoDB Atlas | Managed cloud DB — zero ops overhead for MVP |
 
 ---
 
 ## 📸 Screenshots
-*(Add your screenshots here)*
 
-```md
-![Dashboard](./screenshot.png)
-```
+| Patient Portal | Doctor Dashboard |
+|----------------|-----------------|
+| ![Patient](./screenshots/patient.png) | ![Doctor](./screenshots/doctor.png) |
+
+| Admin Panel | Booking Flow |
+|-------------|-------------|
+| ![Admin](./screenshots/admin.png) | ![Booking](./screenshots/booking.png) |
+
+> 💡 Add your screenshots in a `/screenshots` folder and update paths above.
 
 ---
 
-## 🤝 Contributing
-Contributions are welcome! Feel free to fork and submit a PR.
+## 📄 License
+
+This project is open source and available under the [MIT License](LICENSE).
 
 ---
 
-## ⭐ Show Your Support
-If you like this project, give it a ⭐ on GitHub!
+<div align="center">
+
+**Built with ❤️ by Aneesh Yadav**
+
+*Full Stack Developer · MERN Stack · Node.js · React · MongoDB · Razorpay · Cloudinary*
+
+⭐ **If this project helped you, give it a star!** ⭐
+
+</div>
