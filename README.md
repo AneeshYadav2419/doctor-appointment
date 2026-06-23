@@ -324,19 +324,25 @@ All profile images (patients & doctors) are stored on **Cloudinary**:
 
 ---
 
-## 📸 Screenshots
+                                                   Home Page
 
-| Patient Portal | Doctor Dashboard |
-|----------------|-----------------|
-| ![Patient](./screenshots/patient.png) | ![Doctor](./screenshots/doctor.png) |
+<img width="1918" height="905" alt="Image" src="https://github.com/user-attachments/assets/2cbaceda-db06-4139-9003-4be8f332a149" />
+                                                                
+                                                  Book Appointment
 
-| Admin Panel | Booking Flow |
-|-------------|-------------|
-| ![Admin](./screenshots/admin.png) | ![Booking](./screenshots/booking.png) |
+<img width="1917" height="917" alt="Image" src="https://github.com/user-attachments/assets/5ead53ce-c14c-41c7-87e1-e2e84e146938" />
 
-> 💡 Add your screenshots in a `/screenshots` folder and update paths above.
+                                        Admin & Doctor Dashboard login & SingUp
 
----
+<img width="1918" height="911" alt="Image" src="https://github.com/user-attachments/assets/92f32964-79ee-4ced-8157-35d655cee20e" />
+
+                                                   Admin Dashboard
+
+<img width="1917" height="832" alt="Image" src="https://github.com/user-attachments/assets/9b49730a-3e67-4f64-bb96-0a52b8c03585" />
+
+                                                    Doctor Dashboard
+
+<img width="1911" height="846" alt="Image" src="https://github.com/user-attachments/assets/6cc3233e-568b-48e5-819c-0d50b4ed5d61" />
 
 ## 📄 License
 
