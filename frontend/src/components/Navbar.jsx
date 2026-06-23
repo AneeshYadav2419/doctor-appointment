@@ -10,7 +10,7 @@ const navLinks = [
   { name: "Contact", path: "/contact" },
 ];
 
-const ADMIN_URL = "https://doctor-appointment-8lnn.vercel.app";
+const ADMIN_URL = import.meta.env.VITE_ADMIN_URL || "https://doctor-appointment-8lnn.vercel.app";
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -37,11 +37,10 @@ const Navbar = () => {
   return (
     <>
       <header
-        className={`sticky top-0 z-50 transition-all duration-300 ${
-          scrolled
-            ? "bg-white/90 backdrop-blur-xl shadow-[0_1px_0_0_#E2E8F0]"
-            : "bg-white/80 backdrop-blur-md"
-        }`}
+        className={`sticky top-0 z-50 transition-all duration-300 ${scrolled
+          ? "bg-white/90 backdrop-blur-xl shadow-[0_1px_0_0_#E2E8F0]"
+          : "bg-white/80 backdrop-blur-md"
+          }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
 
@@ -62,10 +61,9 @@ const Navbar = () => {
                 to={link.path}
                 end={link.path === "/"}
                 className={({ isActive }) =>
-                  `relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                    isActive
-                      ? "text-primary bg-primary-light"
-                      : "text-text-secondary hover:text-text-primary hover:bg-slate-100"
+                  `relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${isActive
+                    ? "text-primary bg-primary-light"
+                    : "text-text-secondary hover:text-text-primary hover:bg-slate-100"
                   }`
                 }
               >
@@ -166,9 +164,8 @@ const Navbar = () => {
 
       {/* Mobile Drawer */}
       <aside
-        className={`fixed top-0 right-0 bottom-0 w-72 z-[70] bg-white shadow-2xl transform transition-transform duration-300 ease-out md:hidden ${
-          showMenu ? "translate-x-0" : "translate-x-full"
-        }`}
+        className={`fixed top-0 right-0 bottom-0 w-72 z-[70] bg-white shadow-2xl transform transition-transform duration-300 ease-out md:hidden ${showMenu ? "translate-x-0" : "translate-x-full"
+          }`}
       >
         <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
           <img src={assets.logo} alt="Medilink" className="h-7 w-auto" />
@@ -200,10 +197,9 @@ const Navbar = () => {
               to={link.path}
               end={link.path === "/"}
               className={({ isActive }) =>
-                `block px-4 py-3 rounded-xl text-sm font-medium transition-all ${
-                  isActive
-                    ? "bg-primary-light text-primary"
-                    : "text-text-secondary hover:bg-slate-50 hover:text-text-primary"
+                `block px-4 py-3 rounded-xl text-sm font-medium transition-all ${isActive
+                  ? "bg-primary-light text-primary"
+                  : "text-text-secondary hover:bg-slate-50 hover:text-text-primary"
                 }`
               }
             >
